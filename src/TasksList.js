@@ -74,7 +74,7 @@ export default function TaskList(props) {
     return (
       <tr key={task.id}>
         <td>{task.subject}</td>
-        <td>{getLocaleDateString(task.overdueDate)}</td>
+        <td>{getLocaleDateString(task.dueDate)}</td>
         <td>{createActionsGroup(task)}</td>
       </tr>
     );
