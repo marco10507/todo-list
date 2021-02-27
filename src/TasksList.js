@@ -86,16 +86,20 @@ export default function TaskList(props) {
     });
   }
 
-  return (
-    <Table>
-      <thead>
-        <tr>
-          <th>Subject</th>
-          <th>Overdue Date</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>{createRows(tasks)}</tbody>
-    </Table>
-  );
+  function createTable(tasks) {
+    return (
+      <Table>
+        <thead>
+          <tr>
+            <th>Subject</th>
+            <th>Overdue Date</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>{createRows(tasks)}</tbody>
+      </Table>
+    );
+  }
+
+  return <>{tasks.length > 0 && createTable(tasks)}</>;
 }
