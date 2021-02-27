@@ -14,9 +14,30 @@ export default function ToDoList() {
     completed: false
   });
   const [tasks, setTasks] = useState([
-    { subject: "Walk dog", id: uuid(), completed: false },
-    { subject: "Call the rat", id: uuid(), completed: false },
-    { subject: "Clean the kitchen", id: uuid(), completed: false }
+    {
+      subject: "Walk dog",
+      id: uuid(),
+      completed: false,
+      overdueDate: new Date(2021, 2, 10)
+    },
+    {
+      subject: "Do laundry",
+      id: uuid(),
+      completed: false,
+      overdueDate: new Date(2021, 1, 26)
+    },
+    {
+      subject: "Call the rat",
+      id: uuid(),
+      completed: false,
+      overdueDate: new Date(2021, 1, 27)
+    },
+    {
+      subject: "Clean the kitchen",
+      id: uuid(),
+      completed: false,
+      overdueDate: new Date(2021, 1, 28)
+    }
   ]);
   const [open, setOpen] = useState(false);
 
