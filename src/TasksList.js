@@ -5,7 +5,10 @@ import ButtonGroup from "react-bootstrap/ButtonGroup";
 import { BsCheck, BsX } from "react-icons/bs";
 
 export default function TaskList(props) {
-  const tasks = props.tasks.filter((task) => !task.completed);
+  const filteredTasks = props.tasks.filter((task) => !task.completed);
+  const tasks = filteredTasks.sort(
+    (task1, task2) => task1.dueDate - task2.dueDate
+  );
 
   function getToday() {
     const t = new Date();
