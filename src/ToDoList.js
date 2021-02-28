@@ -48,10 +48,22 @@ export default function ToDoList() {
     return !isBlank(str);
   }
 
-  function handleOnChange(event) {
-    setTask((previousTask) => {
-      return { ...previousTask, subject: event.target.value };
-    });
+  function handleTaskOnChange(event) {
+    const id = event.target.id;
+
+    switch (id) {
+      case "form-subject":
+        setTask((previousTask) => {
+          return { ...previousTask, subject: event.target.value };
+        });
+        break;
+      case "form-due-date":
+        setTask((previousTask) => {
+          return { ...previousTask, dueDate: event.target.valueAsDate };
+        });
+        break;
+      default:
+    }
   }
 
   function handleCreateTask() {
@@ -61,7 +73,12 @@ export default function ToDoList() {
       });
 
       setTask((previousTask) => {
-        return { ...previousTask, subject: "", id: uuid() };
+        return {
+          ...previousTask,
+          subject: "",
+          id: uuid(),
+          dueDate: new Date()
+        };
       });
     }
   }
@@ -104,7 +121,7 @@ export default function ToDoList() {
               <Card.Body>
                 <AddTask
                   task={task}
-                  handleOnChange={handleOnChange}
+                  handleTaskOnChange={handleTaskOnChange}
                   handleCreateTask={handleCreateTask}
                 />
               </Card.Body>

@@ -1,30 +1,28 @@
 import Button from "react-bootstrap/Button";
-import InputGroup from "react-bootstrap/InputGroup";
-import FormControl from "react-bootstrap/FormControl";
+import Form from "react-bootstrap/Form";
+import moment from "moment";
 
 export default function AddTask(props) {
   return (
-    <InputGroup className="mb-3">
-      <FormControl
-        value={props.task.subject}
-        placeholder="Enter new task"
-        aria-label="Enter new task"
-        onChange={(event) => props.handleOnChange(event)}
-        onKeyUp={({ key }) => {
-          if (key === "Enter") {
-            props.handleCreateTask();
-          }
-        }}
-        aria-describedby="basic-addon2"
-      />
-      <InputGroup.Append>
-        <Button
-          onClick={() => props.handleCreateTask()}
-          variant="outline-secondary"
-        >
-          ADD
-        </Button>
-      </InputGroup.Append>
-    </InputGroup>
+    <Form>
+      <Form.Group controlId="form-subject">
+        <Form.Label>Subject</Form.Label>
+        <Form.Control
+          value={props.task.subject}
+          onChange={(event) => props.handleTaskOnChange(event)}
+          type="text"
+          placeholder="enter subject"
+        ></Form.Control>
+      </Form.Group>
+      <Form.Group controlId="form-due-date">
+        <Form.Label>Due Date</Form.Label>
+        <Form.Control
+          value={moment(props.task.dueDate).format("YYYY-MM-DD")}
+          onChange={(event) => props.handleTaskOnChange(event)}
+          type="date"
+        ></Form.Control>
+      </Form.Group>
+      <Button onClick={() => props.handleCreateTask()}>Submit</Button>
+    </Form>
   );
 }
