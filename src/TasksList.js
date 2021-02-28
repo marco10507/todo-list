@@ -92,7 +92,7 @@ export default function TaskList(props) {
         <thead>
           <tr>
             <th>Subject</th>
-            <th>Overdue Date</th>
+            <th>Due Date</th>
             <th>Actions</th>
           </tr>
         </thead>

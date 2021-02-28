@@ -4,8 +4,7 @@ import TaskList from "./TasksList";
 import Card from "react-bootstrap/Card";
 import uuid from "react-uuid";
 import CompletedTaskList from "./CompletedTaskList";
-import Button from "react-bootstrap/Button";
-import Collapse from "react-bootstrap/Collapse";
+import Accordion from "react-bootstrap/Accordion";
 
 export default function ToDoList() {
   const [task, setTask] = useState({
@@ -40,7 +39,6 @@ export default function ToDoList() {
       dueDate: new Date(2021, 1, 28)
     }
   ]);
-  const [open, setOpen] = useState(false);
 
   function isBlank(str) {
     return !str || /^\s*$/.test(str);
@@ -91,32 +89,38 @@ export default function ToDoList() {
       <Card>
         <Card.Header>TO DO LIST</Card.Header>
         <Card.Body>
-          <Card.Title>Pending Tasks</Card.Title>
           <TaskList
             tasks={tasks}
             handleCompleteTask={handleCompleteTask}
             handleRemoveTask={handleRemoveTask}
           />
-          <AddTask
-            task={task}
-            handleOnChange={handleOnChange}
-            handleCreateTask={handleCreateTask}
-          />
-          <Button
-            style={{ color: "grey" }}
-            variant="link"
-            onClick={() => setOpen(!open)}
-            aria-controls="collapse-completed-tasks"
-            aria-expanded={open}
-          >
-            Completed Tasks
-          </Button>
-          <Collapse in={open}>
-            <div id="collapse-completed-tasks">
-              <CompletedTaskList tasks={tasks} />
-            </div>
-          </Collapse>
         </Card.Body>
+        <Accordion>
+          <Card>
+            <Accordion.Toggle as={Card.Header} eventKey="0">
+              Add Task
+            </Accordion.Toggle>
+            <Accordion.Collapse eventKey="0">
+              <Card.Body>
+                <AddTask
+                  task={task}
+                  handleOnChange={handleOnChange}
+                  handleCreateTask={handleCreateTask}
+                />
+              </Card.Body>
+            </Accordion.Collapse>
+          </Card>
+          <Card>
+            <Accordion.Toggle as={Card.Header} eventKey="1">
+              Completed Tasks
+            </Accordion.Toggle>
+            <Accordion.Collapse eventKey="1">
+              <Card.Body>
+                <CompletedTaskList tasks={tasks} />
+              </Card.Body>
+            </Accordion.Collapse>
+          </Card>
+        </Accordion>
       </Card>
     </>
   );
