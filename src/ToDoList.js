@@ -5,40 +5,17 @@ import Card from "react-bootstrap/Card";
 import uuid from "react-uuid";
 import CompletedTaskList from "./CompletedTaskList";
 import Accordion from "react-bootstrap/Accordion";
+import Tasks from "./Tasks";
+import moment from "moment";
 
 export default function ToDoList() {
   const [task, setTask] = useState({
     subject: "",
     id: uuid(),
     completed: false,
-    dueDate: new Date()
+    dueDate: moment()
   });
-  const [tasks, setTasks] = useState([
-    {
-      subject: "Walk dog",
-      id: uuid(),
-      completed: false,
-      dueDate: new Date(2021, 2, 10)
-    },
-    {
-      subject: "Do laundry",
-      id: uuid(),
-      completed: false,
-      dueDate: new Date(2021, 1, 26)
-    },
-    {
-      subject: "Call the rat",
-      id: uuid(),
-      completed: false,
-      dueDate: new Date(2021, 1, 27)
-    },
-    {
-      subject: "Clean the kitchen",
-      id: uuid(),
-      completed: false,
-      dueDate: new Date(2021, 1, 28)
-    }
-  ]);
+  const [tasks, setTasks] = useState(Tasks());
 
   function isBlank(str) {
     return !str || /^\s*$/.test(str);
@@ -77,7 +54,7 @@ export default function ToDoList() {
           ...previousTask,
           subject: "",
           id: uuid(),
-          dueDate: new Date()
+          dueDate: moment()
         };
       });
     }
@@ -105,13 +82,11 @@ export default function ToDoList() {
     <>
       <Card>
         <Card.Header>TO DO LIST</Card.Header>
-        <Card.Body>
-          <TaskList
-            tasks={tasks}
-            handleCompleteTask={handleCompleteTask}
-            handleRemoveTask={handleRemoveTask}
-          />
-        </Card.Body>
+        <TaskList
+          tasks={tasks}
+          handleCompleteTask={handleCompleteTask}
+          handleRemoveTask={handleRemoveTask}
+        />
         <Accordion>
           <Card>
             <Accordion.Toggle as={Card.Header} eventKey="0">
