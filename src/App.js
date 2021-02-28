@@ -1,5 +1,5 @@
 import "bootstrap/dist/css/bootstrap.min.css";
-import ToDoList from "/src/ToDoList";
+import ToDoList from "./components/ToDoList";
 
 export default function App() {
   return (

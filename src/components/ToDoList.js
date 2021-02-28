@@ -5,7 +5,7 @@ import Card from "react-bootstrap/Card";
 import uuid from "react-uuid";
 import CompletedTaskList from "./CompletedTaskList";
 import Accordion from "react-bootstrap/Accordion";
-import Tasks from "./Tasks";
+import Tasks from "../Tasks";
 import moment from "moment";
 
 export default function ToDoList() {
