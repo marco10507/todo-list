@@ -41,7 +41,7 @@ export default function TaskList(props) {
 
   function createRow(task) {
     return (
-      <tr key={task.id}>
+      <tr key={task._id}>
         <td>{task.subject}</td>
         <td>{createDate(task.dueDate)}</td>
         <td>{createActionsGroup(task)}</td>

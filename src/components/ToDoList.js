@@ -1,21 +1,30 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AddTask from "./AddTask";
 import TaskList from "./TasksList";
 import Card from "react-bootstrap/Card";
-import uuid from "react-uuid";
+// import uuid from "react-uuid";
 import CompletedTaskList from "./CompletedTaskList";
 import Accordion from "react-bootstrap/Accordion";
-import Tasks from "../Tasks";
+// import Tasks from "../Tasks";
 import moment from "moment";
 
 export default function ToDoList() {
   const [task, setTask] = useState({
     subject: "",
-    id: uuid(),
     completed: false,
     dueDate: moment()
   });
-  const [tasks, setTasks] = useState(Tasks());
+  const [tasks, setTasks] = useState([]);
+
+  useEffect(() => {
+    fetch("https://0rnfy.sse.codesandbox.io/api/tasks", {
+      method: "GET"
+    })
+      .then((response) => response.json())
+      .then((tasks) => {
+        setTasks(tasks);
+      });
+  }, []);
 
   function isBlank(str) {
     return !str || /^\s*$/.test(str);
@@ -44,38 +53,101 @@ export default function ToDoList() {
   }
 
   function handleCreateTask() {
-    if (isNotBlank(task.subject)) {
-      setTasks((previousTasks) => {
-        return [...previousTasks, task];
-      });
+    inserTask(task)
+      .then((createdTask) => {
+        if (isNotBlank(task.subject)) {
+          setTasks((previousTasks) => {
+            return [...previousTasks, createdTask];
+          });
 
-      setTask((previousTask) => {
-        return {
-          ...previousTask,
-          subject: "",
-          id: uuid(),
-          dueDate: moment()
-        };
+          setTask((previousTask) => {
+            return {
+              ...previousTask,
+              subject: "",
+              dueDate: moment()
+            };
+          });
+        }
+      })
+      .catch((error) => {
+        console.log("error: ", error);
       });
+  }
+
+  async function inserTask(task) {
+    let createdTask;
+    try {
+      const response = await fetch(
+        "https://0rnfy.sse.codesandbox.io/api/tasks",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(task)
+        }
+      );
+
+      createdTask = await response.json();
+    } catch (error) {
+      console.log("error: ", error);
     }
+
+    return createdTask;
   }
 
   function handleCompleteTask(task) {
-    setTasks((previousTasks) => {
-      return previousTasks.map((currentTask) => {
-        if (currentTask.id === task.id) {
-          currentTask.completed = true;
-        }
-
-        return currentTask;
+    task.completed = true;
+    updateTask(task)
+      .then(() => {
+        setTasks((previousTasks) => {
+          return previousTasks.map((currentTask) => {
+            if (currentTask._id === task._id) {
+              currentTask.completed = true;
+            }
+            return currentTask;
+          });
+        });
+      })
+      .catch((error) => {
+        console.log("error: ", error);
       });
-    });
+  }
+
+  async function updateTask(task) {
+    try {
+      await fetch(`https://0rnfy.sse.codesandbox.io/api/tasks/${task._id}`, {
+        method: "PUT",
+        body: JSON.stringify(task),
+        headers: { "Content-Type": "application/json" }
+      });
+    } catch (error) {
+      console.log("deleteTask error: ", error);
+    }
   }
 
   function handleRemoveTask(task) {
-    setTasks((previousTasks) => {
-      return previousTasks.filter((currentTask) => currentTask.id !== task.id);
-    });
+    deleteTask(task._id)
+      .then(() => {
+        setTasks((previousTasks) => {
+          return previousTasks.filter(
+            (currentTask) => currentTask._id !== task._id
+          );
+        });
+      })
+      .catch((error) => {
+        console.log("handleRemoveTask error: ", error);
+      });
+  }
+
+  async function deleteTask(id) {
+    try {
+      await fetch(`https://0rnfy.sse.codesandbox.io/api/tasks/${id}`, {
+        method: "DELETE"
+      });
+    } catch (error) {
+      console.log("deleteTask error: ", error);
+    }
   }
 
   return (

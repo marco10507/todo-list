@@ -9,7 +9,7 @@ export default function CompletedTaskList(props) {
 
   function createCompletedTask(task) {
     return (
-      <ListGroup.Item key={task.id}>
+      <ListGroup.Item key={task._id}>
         <span style={taskStyle}>{task.subject}</span>
       </ListGroup.Item>
     );
