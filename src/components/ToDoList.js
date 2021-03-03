@@ -2,11 +2,10 @@ import { useState, useEffect } from "react";
 import AddTask from "./AddTask";
 import TaskList from "./TasksList";
 import Card from "react-bootstrap/Card";
-// import uuid from "react-uuid";
 import CompletedTaskList from "./CompletedTaskList";
 import Accordion from "react-bootstrap/Accordion";
-// import Tasks from "../Tasks";
 import moment from "moment";
+import taskAPI from "../api/TaskApi";
 
 export default function ToDoList() {
   const [task, setTask] = useState({
@@ -17,12 +16,13 @@ export default function ToDoList() {
   const [tasks, setTasks] = useState([]);
 
   useEffect(() => {
-    fetch("https://0rnfy.sse.codesandbox.io/api/tasks", {
-      method: "GET"
-    })
-      .then((response) => response.json())
-      .then((tasks) => {
-        setTasks(tasks);
+    taskAPI
+      .getAll()
+      .then((response) => {
+        setTasks(response.data);
+      })
+      .catch((error) => {
+        console.log("error: ", error);
       });
   }, []);
 
@@ -53,11 +53,12 @@ export default function ToDoList() {
   }
 
   function handleCreateTask() {
-    inserTask(task)
-      .then((createdTask) => {
+    taskAPI
+      .save(task)
+      .then((reponse) => {
         if (isNotBlank(task.subject)) {
           setTasks((previousTasks) => {
-            return [...previousTasks, createdTask];
+            return [...previousTasks, reponse.data];
           });
 
           setTask((previousTask) => {
@@ -74,31 +75,10 @@ export default function ToDoList() {
       });
   }
 
-  async function inserTask(task) {
-    let createdTask;
-    try {
-      const response = await fetch(
-        "https://0rnfy.sse.codesandbox.io/api/tasks",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify(task)
-        }
-      );
-
-      createdTask = await response.json();
-    } catch (error) {
-      console.log("error: ", error);
-    }
-
-    return createdTask;
-  }
-
   function handleCompleteTask(task) {
     task.completed = true;
-    updateTask(task)
+    taskAPI
+      .update(task, task._id)
       .then(() => {
         setTasks((previousTasks) => {
           return previousTasks.map((currentTask) => {
@@ -114,20 +94,9 @@ export default function ToDoList() {
       });
   }
 
-  async function updateTask(task) {
-    try {
-      await fetch(`https://0rnfy.sse.codesandbox.io/api/tasks/${task._id}`, {
-        method: "PUT",
-        body: JSON.stringify(task),
-        headers: { "Content-Type": "application/json" }
-      });
-    } catch (error) {
-      console.log("deleteTask error: ", error);
-    }
-  }
-
   function handleRemoveTask(task) {
-    deleteTask(task._id)
+    taskAPI
+      .delete(task._id)
       .then(() => {
         setTasks((previousTasks) => {
           return previousTasks.filter(
@@ -138,16 +107,6 @@ export default function ToDoList() {
       .catch((error) => {
         console.log("handleRemoveTask error: ", error);
       });
-  }
-
-  async function deleteTask(id) {
-    try {
-      await fetch(`https://0rnfy.sse.codesandbox.io/api/tasks/${id}`, {
-        method: "DELETE"
-      });
-    } catch (error) {
-      console.log("deleteTask error: ", error);
-    }
   }
 
   return (
