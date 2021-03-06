@@ -7,6 +7,7 @@ import Accordion from "react-bootstrap/Accordion";
 import moment from "moment";
 import taskAPI from "../api/TaskApi";
 import { useAuth0 } from "@auth0/auth0-react";
+import LogoutButton from "./LogoutButton";
 
 export default function ToDoList() {
   const { getAccessTokenSilently } = useAuth0();
@@ -119,7 +120,7 @@ export default function ToDoList() {
   return (
     <>
       <Card>
-        <Card.Header>TO DO LIST</Card.Header>
+        <Card.Header className="text-center">TO DO LIST</Card.Header>
         <TaskList
           tasks={tasks}
           handleCompleteTask={handleCompleteTask}
@@ -127,7 +128,11 @@ export default function ToDoList() {
         />
         <Accordion>
           <Card>
-            <Accordion.Toggle as={Card.Header} eventKey="0">
+            <Accordion.Toggle
+              className="text-center"
+              as={Card.Header}
+              eventKey="0"
+            >
               Add Task
             </Accordion.Toggle>
             <Accordion.Collapse eventKey="0">
@@ -141,7 +146,11 @@ export default function ToDoList() {
             </Accordion.Collapse>
           </Card>
           <Card>
-            <Accordion.Toggle as={Card.Header} eventKey="1">
+            <Accordion.Toggle
+              className="text-center"
+              as={Card.Header}
+              eventKey="1"
+            >
               Completed Tasks
             </Accordion.Toggle>
             <Accordion.Collapse eventKey="1">
@@ -151,6 +160,9 @@ export default function ToDoList() {
             </Accordion.Collapse>
           </Card>
         </Accordion>
+        <Card.Footer className="text-center">
+          <LogoutButton />
+        </Card.Footer>
       </Card>
     </>
   );
