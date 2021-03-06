@@ -6,25 +6,35 @@ import CompletedTaskList from "./CompletedTaskList";
 import Accordion from "react-bootstrap/Accordion";
 import moment from "moment";
 import taskAPI from "../api/TaskApi";
+import { useAuth0 } from "@auth0/auth0-react";
 
 export default function ToDoList() {
+  const { user } = useAuth0();
+  const { sub } = user;
+  const { getAccessTokenSilently } = useAuth0();
+
   const [task, setTask] = useState({
     subject: "",
     completed: false,
-    dueDate: moment()
+    dueDate: moment(),
+    ownerId: sub
   });
   const [tasks, setTasks] = useState([]);
 
   useEffect(() => {
-    taskAPI
-      .getAll()
-      .then((response) => {
-        setTasks(response.data);
-      })
-      .catch((error) => {
+    async function init() {
+      try {
+        const accessToken = await getAccessTokenSilently();
+        const response = await taskAPI().getAll(accessToken);
+        const fetchedTasks = response.data;
+        setTasks(fetchedTasks);
+        console.log(fetchedTasks);
+      } catch (error) {
         console.log("error: ", error);
-      });
-  }, []);
+      }
+    }
+    init();
+  }, [getAccessTokenSilently]);
 
   function isBlank(str) {
     return !str || /^\s*$/.test(str);
@@ -52,61 +62,61 @@ export default function ToDoList() {
     }
   }
 
-  function handleCreateTask() {
-    taskAPI
-      .save(task)
-      .then((reponse) => {
-        if (isNotBlank(task.subject)) {
-          setTasks((previousTasks) => {
-            return [...previousTasks, reponse.data];
-          });
+  async function handleCreateTask() {
+    if (isNotBlank(task.subject)) {
+      try {
+        const accessToken = await getAccessTokenSilently();
+        const response = await taskAPI().save(task, accessToken);
+        const createdTask = response.data;
 
-          setTask((previousTask) => {
-            return {
-              ...previousTask,
-              subject: "",
-              dueDate: moment()
-            };
-          });
-        }
-      })
-      .catch((error) => {
+        setTasks((previousTasks) => {
+          return [...previousTasks, createdTask];
+        });
+
+        setTask((previousTask) => {
+          return {
+            ...previousTask,
+            subject: "",
+            dueDate: moment()
+          };
+        });
+      } catch (error) {
         console.log("error: ", error);
-      });
+      }
+    }
   }
 
-  function handleCompleteTask(task) {
-    task.completed = true;
-    taskAPI
-      .update(task, task._id)
-      .then(() => {
-        setTasks((previousTasks) => {
-          return previousTasks.map((currentTask) => {
-            if (currentTask._id === task._id) {
-              currentTask.completed = true;
-            }
-            return currentTask;
-          });
+  async function handleCompleteTask(task) {
+    try {
+      task.completed = true;
+
+      const accessToken = await getAccessTokenSilently();
+      await taskAPI().update(task, task._id, accessToken);
+
+      setTasks((previousTasks) => {
+        return previousTasks.map((currentTask) => {
+          if (currentTask._id === task._id) {
+            currentTask.completed = true;
+          }
+          return currentTask;
         });
-      })
-      .catch((error) => {
-        console.log("error: ", error);
       });
+    } catch (error) {
+      console.log("error: ", error);
+    }
   }
 
-  function handleRemoveTask(task) {
-    taskAPI
-      .delete(task._id)
-      .then(() => {
-        setTasks((previousTasks) => {
-          return previousTasks.filter(
-            (currentTask) => currentTask._id !== task._id
-          );
-        });
-      })
-      .catch((error) => {
-        console.log("handleRemoveTask error: ", error);
+  async function handleRemoveTask(task) {
+    try {
+      await taskAPI().delete(task._id);
+      setTasks((previousTasks) => {
+        return previousTasks.filter(
+          (currentTask) => currentTask._id !== task._id
+        );
       });
+    } catch (error) {
+      console.log("handleRemoveTask error: ", error);
+    }
   }
 
   return (
