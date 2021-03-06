@@ -2,7 +2,7 @@ import axios from "axios";
 
 export default function TaskApi() {
   const apiClient = axios.create({
-    baseURL: "https://0rnfy.sse.codesandbox.io/api/"
+    baseURL: "https://3hxp4.sse.codesandbox.io/api"
   });
 
   return {
@@ -12,13 +12,19 @@ export default function TaskApi() {
       return apiClient.get("/tasks", options);
     },
     save: (payload, accessToken) => {
-      return apiClient.post("/tasks", payload);
+      const options = { headers: { Authorization: `Bearer ${accessToken}` } };
+
+      return apiClient.post("/tasks", payload, options);
     },
     update: (payload, taskId, accessToken) => {
-      return apiClient.put(`/tasks/${taskId}`, payload);
+      const options = { headers: { Authorization: `Bearer ${accessToken}` } };
+
+      return apiClient.put(`/tasks/${taskId}`, payload, options);
     },
     delete: (taskId, accessToken) => {
-      return apiClient.delete(`/tasks/${taskId}`);
+      const options = { headers: { Authorization: `Bearer ${accessToken}` } };
+
+      return apiClient.delete(`/tasks/${taskId}`, options);
     }
   };
 }

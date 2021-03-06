@@ -9,15 +9,12 @@ import taskAPI from "../api/TaskApi";
 import { useAuth0 } from "@auth0/auth0-react";
 
 export default function ToDoList() {
-  const { user } = useAuth0();
-  const { sub } = user;
   const { getAccessTokenSilently } = useAuth0();
 
   const [task, setTask] = useState({
     subject: "",
     completed: false,
-    dueDate: moment(),
-    ownerId: sub
+    dueDate: moment()
   });
   const [tasks, setTasks] = useState([]);
 
@@ -28,7 +25,6 @@ export default function ToDoList() {
         const response = await taskAPI().getAll(accessToken);
         const fetchedTasks = response.data;
         setTasks(fetchedTasks);
-        console.log(fetchedTasks);
       } catch (error) {
         console.log("error: ", error);
       }
@@ -108,7 +104,8 @@ export default function ToDoList() {
 
   async function handleRemoveTask(task) {
     try {
-      await taskAPI().delete(task._id);
+      const accessToken = await getAccessTokenSilently();
+      await taskAPI().delete(task._id, accessToken);
       setTasks((previousTasks) => {
         return previousTasks.filter(
           (currentTask) => currentTask._id !== task._id
