@@ -1,6 +1,6 @@
 import Spinner from "react-bootstrap/Spinner";
 
-export default function Loading() {
+export default function Loading(props) {
   const spinnerStyle = {
     width: "50px",
     height: "50px",
@@ -10,9 +10,15 @@ export default function Loading() {
     margin: "-25px 0 0 -25px"
   };
 
-  return (
-    <Spinner style={spinnerStyle} animation="border" variant="primary">
-      <span className="sr-only">Loading...</span>
-    </Spinner>
-  );
+  const isLoading = props.isLoading == null ? true : props.isLoading;
+
+  if (isLoading) {
+    return (
+      <Spinner style={spinnerStyle} animation="border" variant="primary">
+        <span className="sr-only">Loading...</span>
+      </Spinner>
+    );
+  } else {
+    return props.children;
+  }
 }

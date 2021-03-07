@@ -8,6 +8,7 @@ import moment from "moment";
 import taskAPI from "../api/TaskApi";
 import { useAuth0 } from "@auth0/auth0-react";
 import LogoutButton from "./LogoutButton";
+import Spinner from "./Spinner";
 
 export default function ToDoList() {
   const { getAccessTokenSilently } = useAuth0();
@@ -18,6 +19,7 @@ export default function ToDoList() {
     dueDate: moment()
   });
   const [tasks, setTasks] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function init() {
@@ -26,6 +28,8 @@ export default function ToDoList() {
         const response = await taskAPI().getAll(accessToken);
         const fetchedTasks = response.data;
         setTasks(fetchedTasks);
+        setIsLoading((loading) => !loading);
+        console.log("mounting");
       } catch (error) {
         console.log("error: ", error);
       }
@@ -62,6 +66,8 @@ export default function ToDoList() {
   async function handleCreateTask() {
     if (isNotBlank(task.subject)) {
       try {
+        setIsLoading((loading) => !loading);
+
         const accessToken = await getAccessTokenSilently();
         const response = await taskAPI().save(task, accessToken);
         const createdTask = response.data;
@@ -77,6 +83,8 @@ export default function ToDoList() {
             dueDate: moment()
           };
         });
+
+        setIsLoading((loading) => !loading);
       } catch (error) {
         console.log("error: ", error);
       }
@@ -85,6 +93,8 @@ export default function ToDoList() {
 
   async function handleCompleteTask(task) {
     try {
+      setIsLoading((loading) => !loading);
+
       task.completed = true;
 
       const accessToken = await getAccessTokenSilently();
@@ -98,6 +108,8 @@ export default function ToDoList() {
           return currentTask;
         });
       });
+
+      setIsLoading((loading) => !loading);
     } catch (error) {
       console.log("error: ", error);
     }
@@ -105,6 +117,8 @@ export default function ToDoList() {
 
   async function handleRemoveTask(task) {
     try {
+      setIsLoading((loading) => !loading);
+
       const accessToken = await getAccessTokenSilently();
       await taskAPI().delete(task._id, accessToken);
       setTasks((previousTasks) => {
@@ -112,13 +126,15 @@ export default function ToDoList() {
           (currentTask) => currentTask._id !== task._id
         );
       });
+
+      setIsLoading((loading) => !loading);
     } catch (error) {
       console.log("handleRemoveTask error: ", error);
     }
   }
 
   return (
-    <>
+    <Spinner active={isLoading}>
       <Card>
         <Card.Header className="text-center">TO DO LIST</Card.Header>
         <TaskList
@@ -164,6 +180,6 @@ export default function ToDoList() {
           <LogoutButton />
         </Card.Footer>
       </Card>
-    </>
+    </Spinner>
   );
 }
