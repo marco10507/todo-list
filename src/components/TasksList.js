@@ -13,13 +13,17 @@ export default function TaskList(props) {
 
   function createActionsGroup(task) {
     return (
-      <ButtonToolbar aria-label="Toolbar with button groups">
-        <ButtonGroup size="sm" className="mr-2" aria-label="First group">
-          <Button onClick={() => props.handleCompleteTask(task)}>
+      <ButtonToolbar
+        className="justify-content-center"
+        aria-label="Toolbar with button groups"
+      >
+        <ButtonGroup size="sm" aria-label="First group">
+          <Button
+            className="mr-1"
+            onClick={() => props.handleCompleteTask(task)}
+          >
             <BsCheck />
           </Button>
-        </ButtonGroup>
-        <ButtonGroup size="sm" className="mr-3" aria-label="First group">
           <Button onClick={() => props.handleRemoveTask(task)}>
             <BsX />
           </Button>
@@ -57,7 +61,7 @@ export default function TaskList(props) {
 
   function createTable(tasks) {
     return (
-      <Table>
+      <Table className="text-center">
         <thead>
           <tr>
             <th>Subject</th>
