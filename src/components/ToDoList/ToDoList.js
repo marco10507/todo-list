@@ -4,10 +4,10 @@ import Card from "react-bootstrap/Card";
 import CompletedTaskList from "./CompletedTaskList";
 import Accordion from "react-bootstrap/Accordion";
 import moment from "moment";
-import taskAPI from "../api/TaskApi";
+import taskAPI from "../../api/TaskApi";
 import { useAuth0 } from "@auth0/auth0-react";
-import LogoutButton from "./LogoutButton";
-import Spinner from "./Spinner";
+import LogoutButton from "../LogoutButton";
+import Spinner from "../Spinner";
 import TasksTable from "./TasksTable";
 import TaskActionsToolBar from "./TaskActionsToolBar";
 
