@@ -48,7 +48,8 @@ export default function TasksTable({ data, handleUpdateTask }) {
       data={data}
       columns={columns}
       cellEdit={cellEditFactory({
-        mode: "click",
+        mode: "dbclick",
+        blurToSave: true,
         afterSaveCell: (oldValue, newValue, row, column) => {
           const { _id } = row;
           const task = { _id: _id, [column.dataField]: newValue };
