@@ -10,6 +10,7 @@ import LogoutButton from "../LogoutButton";
 import Spinner from "../Spinner";
 import TasksTable from "./TasksTable";
 import TaskActionsToolBar from "./TaskActionsToolBar";
+import { isNotBlank } from "../../helpers/string-helpers";
 
 export default function ToDoList() {
   const { getAccessTokenSilently } = useAuth0();
@@ -37,14 +38,6 @@ export default function ToDoList() {
     }
     init();
   }, [getAccessTokenSilently]);
-
-  function isBlank(str) {
-    return !str || /^\s*$/.test(str);
-  }
-
-  function isNotBlank(str) {
-    return !isBlank(str);
-  }
 
   function handleTaskOnChange(event) {
     const id = event.target.id;
