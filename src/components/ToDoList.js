@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import AddTask from "./AddTask";
-import TaskList from "./TasksList";
 import Card from "react-bootstrap/Card";
 import CompletedTaskList from "./CompletedTaskList";
 import Accordion from "react-bootstrap/Accordion";
@@ -9,6 +8,8 @@ import taskAPI from "../api/TaskApi";
 import { useAuth0 } from "@auth0/auth0-react";
 import LogoutButton from "./LogoutButton";
 import Spinner from "./Spinner";
+import TasksTable from "./TasksTable";
+import TaskActionsToolBar from "./TaskActionsToolBar";
 
 export default function ToDoList() {
   const { getAccessTokenSilently } = useAuth0();
@@ -91,30 +92,6 @@ export default function ToDoList() {
     }
   }
 
-  async function handleCompleteTask(task) {
-    try {
-      setIsLoading((loading) => !loading);
-
-      task.completed = true;
-
-      const accessToken = await getAccessTokenSilently();
-      await taskAPI().update(task, task._id, accessToken);
-
-      setTasks((previousTasks) => {
-        return previousTasks.map((currentTask) => {
-          if (currentTask._id === task._id) {
-            currentTask.completed = true;
-          }
-          return currentTask;
-        });
-      });
-
-      setIsLoading((loading) => !loading);
-    } catch (error) {
-      console.log("error: ", error);
-    }
-  }
-
   async function handleRemoveTask(task) {
     try {
       setIsLoading((loading) => !loading);
@@ -133,15 +110,81 @@ export default function ToDoList() {
     }
   }
 
+  function createPendingTasksTable(tasks) {
+    const filteredTasks = tasks.filter((task) => !task.completed);
+    const sortedTasks = filteredTasks.sort(
+      (task1, task2) => task1.dueDate - task2.dueDate
+    );
+
+    const data = sortedTasks.map((task) => {
+      return {
+        _id: task._id,
+        subject: task.subject,
+        dueDate: task.dueDate,
+        actions: (
+          <TaskActionsToolBar
+            task={task}
+            handleCompleteTask={handleCompleteTask}
+            handleRemoveTask={handleRemoveTask}
+          />
+        )
+      };
+    });
+
+    return (
+      <>
+        {data.length > 0 && (
+          <TasksTable data={data} handleUpdateTask={handleUpdateTask} />
+        )}
+      </>
+    );
+  }
+
+  async function updateTask(task, taskId) {
+    const accessToken = await getAccessTokenSilently();
+    await taskAPI().update(task, taskId, accessToken);
+
+    setTasks((previousTasks) => {
+      return previousTasks.map((currentTask) => {
+        if (currentTask._id === taskId) {
+          return { ...currentTask, ...task };
+        }
+        return currentTask;
+      });
+    });
+  }
+
+  async function handleUpdateTask(task) {
+    try {
+      setIsLoading((loading) => !loading);
+
+      updateTask(task, task._id);
+
+      setIsLoading((loading) => !loading);
+    } catch (error) {
+      console.log("error: ", error);
+    }
+  }
+
+  async function handleCompleteTask(task) {
+    try {
+      setIsLoading((loading) => !loading);
+
+      task.completed = true;
+
+      updateTask(task, task._id);
+
+      setIsLoading((loading) => !loading);
+    } catch (error) {
+      console.log("error: ", error);
+    }
+  }
+
   return (
     <Spinner active={isLoading}>
       <Card>
         <Card.Header className="text-center">TO DO LIST</Card.Header>
-        <TaskList
-          tasks={tasks}
-          handleCompleteTask={handleCompleteTask}
-          handleRemoveTask={handleRemoveTask}
-        />
+        {createPendingTasksTable(tasks)}
         <Accordion>
           <Card>
             <Accordion.Toggle
