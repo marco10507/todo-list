@@ -1,8 +1,5 @@
 import { useState, useEffect } from "react";
-import AddTask from "./AddTask";
 import Card from "react-bootstrap/Card";
-import CompletedTaskList from "./CompletedTaskList";
-import Accordion from "react-bootstrap/Accordion";
 import moment from "moment";
 import taskAPI from "../../api/TaskApi";
 import { useAuth0 } from "@auth0/auth0-react";
@@ -11,6 +8,7 @@ import Spinner from "../Spinner";
 import TasksTable from "./TasksTable";
 import TaskActionsToolBar from "./TaskActionsToolBar";
 import { isNotBlank } from "../../helpers/string-helpers";
+import ToDoAccordion from "./ToDoAccordion";
 
 export default function ToDoList() {
   const { getAccessTokenSilently } = useAuth0();
@@ -178,40 +176,12 @@ export default function ToDoList() {
       <Card>
         <Card.Header className="text-center">TO DO LIST</Card.Header>
         {createPendingTasksTable(tasks)}
-        <Accordion>
-          <Card>
-            <Accordion.Toggle
-              className="text-center"
-              as={Card.Header}
-              eventKey="0"
-            >
-              Add Task
-            </Accordion.Toggle>
-            <Accordion.Collapse eventKey="0">
-              <Card.Body>
-                <AddTask
-                  task={task}
-                  handleTaskOnChange={handleTaskOnChange}
-                  handleCreateTask={handleCreateTask}
-                />
-              </Card.Body>
-            </Accordion.Collapse>
-          </Card>
-          <Card>
-            <Accordion.Toggle
-              className="text-center"
-              as={Card.Header}
-              eventKey="1"
-            >
-              Completed Tasks
-            </Accordion.Toggle>
-            <Accordion.Collapse eventKey="1">
-              <Card.Body>
-                <CompletedTaskList tasks={tasks} />
-              </Card.Body>
-            </Accordion.Collapse>
-          </Card>
-        </Accordion>
+        <ToDoAccordion
+          task={task}
+          tasks={tasks}
+          handleTaskOnChange={handleTaskOnChange}
+          handleCreateTask={handleCreateTask}
+        />
         <Card.Footer className="text-center">
           <LogoutButton />
         </Card.Footer>
