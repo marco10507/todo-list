@@ -1,6 +1,7 @@
 import Accordion from "react-bootstrap/Accordion";
 import AddTask from "../AddTask";
 import Card from "react-bootstrap/Card";
+import React from "react"
 
 export default function AddTaskAccordionItem(props) {
   const { task, handleTaskOnChange, handleCreateTask, eventKey } = props;

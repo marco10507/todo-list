@@ -9,6 +9,7 @@ import TasksTable from "./TasksTable";
 import TaskActionsToolBar from "./TaskActionsToolBar";
 import { isNotBlank } from "../../helpers/string-helpers";
 import ToDoAccordion from "./ToDoAccordion";
+import React from "react"
 
 export default function ToDoList() {
   const { getAccessTokenSilently } = useAuth0();

@@ -1,4 +1,5 @@
 import ListGroup from "react-bootstrap/esm/ListGroup";
+import React from "react"
 
 export default function CompletedTaskList(props) {
   const tasks = props.tasks;

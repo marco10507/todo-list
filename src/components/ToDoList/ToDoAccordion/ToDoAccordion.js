@@ -2,6 +2,7 @@ import Accordion from "react-bootstrap/Accordion";
 import Card from "react-bootstrap/Card";
 import AddTaskAccordionItem from "./AddTaskAccordionItem";
 import CompletedTasksAccordionItem from "./CompletedTasksAccordionItem";
+import React from "react";
 
 export default function ToDoAccordion(props) {
   const { task, tasks, handleTaskOnChange, handleCreateTask } = props;

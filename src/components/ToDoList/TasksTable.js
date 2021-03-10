@@ -1,6 +1,7 @@
 import BootstrapTable from "react-bootstrap-table-next";
 import cellEditFactory, { Type } from "react-bootstrap-table2-editor";
 import moment from "moment";
+import React from "react"
 
 export default function TasksTable({ data, handleUpdateTask }) {
   const columns = [

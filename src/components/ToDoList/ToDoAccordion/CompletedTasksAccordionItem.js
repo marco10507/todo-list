@@ -1,6 +1,7 @@
 import Accordion from "react-bootstrap/Accordion";
 import Card from "react-bootstrap/Card";
 import CompletedTaskList from "../CompletedTaskList";
+import React from "react"
 
 export default function CompletedTasksAccordionItem(props) {
   const { tasks, eventKey } = props;
