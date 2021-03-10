@@ -1,192 +1,154 @@
-import { useState, useEffect } from "react";
+import {useEffect} from "react";
 import Card from "react-bootstrap/Card";
 import moment from "moment";
-import taskAPI from "../../api/TaskApi";
-import { useAuth0 } from "@auth0/auth0-react";
+import {useAuth0} from "@auth0/auth0-react";
 import LogoutButton from "../LogoutButton";
 import Spinner from "../Spinner";
 import TasksTable from "./TasksTable";
-import TaskActionsToolBar from "./TaskActionsToolBar";
-import { isNotBlank } from "../../helpers/string-helpers";
+import {isNotBlank} from "../../helpers/string-helpers";
 import ToDoAccordion from "./ToDoAccordion";
 import React from "react"
+import {useTask, useTasks, useLoading, createPendingTasksRows, tasksDataBase} from "./ToDoListLogic"
 
 export default function ToDoList() {
-  const { getAccessTokenSilently } = useAuth0();
+    const {getAccessTokenSilently} = useAuth0();
+    const {getAllTasksDB, saveTaskDB, removeTaskDB, updateTaskDB} = tasksDataBase();
+    const {task, setTask} = useTask();
+    const {tasks, addTask, addTasks, removeTask, updateTask} = useTasks();
+    const {loading, startLoading, endLoading} = useLoading();
 
-  const [task, setTask] = useState({
-    subject: "",
-    completed: false,
-    dueDate: moment()
-  });
-  const [tasks, setTasks] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+    useEffect(() => {
+        async function init() {
+            try {
+                startLoading();
 
-  useEffect(() => {
-    async function init() {
-      try {
-        const accessToken = await getAccessTokenSilently();
-        const response = await taskAPI().getAll(accessToken);
-        const fetchedTasks = response.data;
-        setTasks(fetchedTasks);
-        setIsLoading((loading) => !loading);
-        console.log("mounting");
-      } catch (error) {
-        console.log("error: ", error);
-      }
+                const fetchedTasks = await getAllTasksDB(getAccessTokenSilently);
+                addTasks(fetchedTasks);
+
+                endLoading();
+            } catch (error) {
+                console.log("error: ", error);
+            }
+        }
+
+        init();
+    }, [getAccessTokenSilently]);
+
+    function handleTaskOnChange(event) {
+        const id = event.target.id;
+
+        switch (id) {
+            case "form-subject":
+                setTask((previousTask) => {
+                    return {...previousTask, subject: event.target.value};
+                });
+                break;
+            case "form-due-date":
+                setTask((previousTask) => {
+                    return {...previousTask, dueDate: event.target.valueAsDate};
+                });
+                break;
+            default:
+        }
     }
-    init();
-  }, [getAccessTokenSilently]);
 
-  function handleTaskOnChange(event) {
-    const id = event.target.id;
+    async function handleCreateTask() {
+        if (isNotBlank(task.subject)) {
+            try {
+                startLoading();
 
-    switch (id) {
-      case "form-subject":
-        setTask((previousTask) => {
-          return { ...previousTask, subject: event.target.value };
-        });
-        break;
-      case "form-due-date":
-        setTask((previousTask) => {
-          return { ...previousTask, dueDate: event.target.valueAsDate };
-        });
-        break;
-      default:
+                const createdTask = await saveTaskDB(task, getAccessTokenSilently);
+
+                addTask(createdTask);
+
+                setTask((previousTask) => {
+                    return {
+                        ...previousTask,
+                        subject: "",
+                        dueDate: moment()
+                    };
+                });
+
+                endLoading();
+            } catch (error) {
+                console.log("error: ", error);
+            }
+        }
     }
-  }
 
-  async function handleCreateTask() {
-    if (isNotBlank(task.subject)) {
-      try {
-        setIsLoading((loading) => !loading);
+    async function handleRemoveTask(task) {
+        try {
+            startLoading();
 
-        const accessToken = await getAccessTokenSilently();
-        const response = await taskAPI().save(task, accessToken);
-        const createdTask = response.data;
+            await removeTaskDB(task._id, getAccessTokenSilently);
+            removeTask(task._id);
 
-        setTasks((previousTasks) => {
-          return [...previousTasks, createdTask];
-        });
-
-        setTask((previousTask) => {
-          return {
-            ...previousTask,
-            subject: "",
-            dueDate: moment()
-          };
-        });
-
-        setIsLoading((loading) => !loading);
-      } catch (error) {
-        console.log("error: ", error);
-      }
+            endLoading();
+        } catch (error) {
+            console.log("handleRemoveTask error: ", error);
+        }
     }
-  }
 
-  async function handleRemoveTask(task) {
-    try {
-      setIsLoading((loading) => !loading);
+    async function handleUpdateTask(task) {
+        try {
+            startLoading();
 
-      const accessToken = await getAccessTokenSilently();
-      await taskAPI().delete(task._id, accessToken);
-      setTasks((previousTasks) => {
-        return previousTasks.filter(
-          (currentTask) => currentTask._id !== task._id
+            await updateTaskDB(task, task._id, getAccessTokenSilently);
+            updateTask(task, task._id);
+
+            endLoading();
+        } catch (error) {
+            console.log("error: ", error);
+        }
+    }
+
+    async function handleCompleteTask(task) {
+        try {
+            startLoading();
+
+            task.completed = true;
+
+            await updateTaskDB(task, task._id, getAccessTokenSilently);
+            updateTask(task, task._id);
+
+            endLoading();
+        } catch (error) {
+            console.log("error: ", error);
+        }
+    }
+
+    function createPendingTasksTable(tasks) {
+        const filteredTasks = tasks.filter((task) => !task.completed);
+        const sortedTasks = filteredTasks.sort(
+            (task1, task2) => task1.dueDate - task2.dueDate
         );
-      });
 
-      setIsLoading((loading) => !loading);
-    } catch (error) {
-      console.log("handleRemoveTask error: ", error);
+        const data = createPendingTasksRows(sortedTasks, handleCompleteTask, handleRemoveTask);
+
+        return (
+            <>
+                {data.length > 0 && (
+                    <TasksTable data={data} handleUpdateTask={handleUpdateTask}/>
+                )}
+            </>
+        );
     }
-  }
-
-  function createPendingTasksTable(tasks) {
-    const filteredTasks = tasks.filter((task) => !task.completed);
-    const sortedTasks = filteredTasks.sort(
-      (task1, task2) => task1.dueDate - task2.dueDate
-    );
-
-    const data = sortedTasks.map((task) => {
-      return {
-        _id: task._id,
-        subject: task.subject,
-        dueDate: task.dueDate,
-        actions: (
-          <TaskActionsToolBar
-            task={task}
-            handleCompleteTask={handleCompleteTask}
-            handleRemoveTask={handleRemoveTask}
-          />
-        )
-      };
-    });
 
     return (
-      <>
-        {data.length > 0 && (
-          <TasksTable data={data} handleUpdateTask={handleUpdateTask} />
-        )}
-      </>
+        <Spinner active={loading}>
+            <Card>
+                <Card.Header className="text-center">TO DO LIST</Card.Header>
+                {createPendingTasksTable(tasks)}
+                <ToDoAccordion
+                    task={task}
+                    tasks={tasks}
+                    handleTaskOnChange={handleTaskOnChange}
+                    handleCreateTask={handleCreateTask}
+                />
+                <Card.Footer className="text-center">
+                    <LogoutButton/>
+                </Card.Footer>
+            </Card>
+        </Spinner>
     );
-  }
-
-  async function updateTask(task, taskId) {
-    const accessToken = await getAccessTokenSilently();
-    await taskAPI().update(task, taskId, accessToken);
-
-    setTasks((previousTasks) => {
-      return previousTasks.map((currentTask) => {
-        if (currentTask._id === taskId) {
-          return { ...currentTask, ...task };
-        }
-        return currentTask;
-      });
-    });
-  }
-
-  async function handleUpdateTask(task) {
-    try {
-      setIsLoading((loading) => !loading);
-
-      updateTask(task, task._id);
-
-      setIsLoading((loading) => !loading);
-    } catch (error) {
-      console.log("error: ", error);
-    }
-  }
-
-  async function handleCompleteTask(task) {
-    try {
-      setIsLoading((loading) => !loading);
-
-      task.completed = true;
-
-      updateTask(task, task._id);
-
-      setIsLoading((loading) => !loading);
-    } catch (error) {
-      console.log("error: ", error);
-    }
-  }
-
-  return (
-    <Spinner active={isLoading}>
-      <Card>
-        <Card.Header className="text-center">TO DO LIST</Card.Header>
-        {createPendingTasksTable(tasks)}
-        <ToDoAccordion
-          task={task}
-          tasks={tasks}
-          handleTaskOnChange={handleTaskOnChange}
-          handleCreateTask={handleCreateTask}
-        />
-        <Card.Footer className="text-center">
-          <LogoutButton />
-        </Card.Footer>
-      </Card>
-    </Spinner>
-  );
 }
