@@ -5,21 +5,21 @@ import CompletedTasksAccordionItem from "./CompletedTasksAccordionItem";
 import React from "react";
 
 export default function ToDoAccordion(props) {
-  const { task, tasks, handleTaskOnChange, handleCreateTask } = props;
+    const {task, tasks, handleTaskOnChange, handleCreateTask} = props;
 
-  return (
-    <Accordion>
-      <Card>
-        <AddTaskAccordionItem
-          task={task}
-          handleTaskOnChange={handleTaskOnChange}
-          handleCreateTask={handleCreateTask}
-          eventKey={"0"}
-        />
-      </Card>
-      <Card>
-        <CompletedTasksAccordionItem tasks={tasks} eventKey={"1"} />
-      </Card>
-    </Accordion>
-  );
+    return (
+        <Accordion>
+            <Card>
+                <AddTaskAccordionItem
+                    task={task}
+                    handleTaskOnChange={handleTaskOnChange}
+                    handleCreateTask={handleCreateTask}
+                    eventKey={"0"}
+                />
+            </Card>
+            <Card>
+                <CompletedTasksAccordionItem tasks={tasks} eventKey={"1"}/>
+            </Card>
+        </Accordion>
+    );
 }
