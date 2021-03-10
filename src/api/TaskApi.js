@@ -2,7 +2,7 @@ import axios from "axios";
 
 export default function TaskApi() {
   const apiClient = axios.create({
-    baseURL: "https://3hxp4.sse.codesandbox.io/api"
+    baseURL: "http://localhost:6060/api"
   });
 
   return {
