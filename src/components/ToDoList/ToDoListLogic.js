@@ -87,7 +87,7 @@ export function createPendingTasksRows(tasks, handleCompleteTask, handleRemoveTa
         return {
             _id: task._id,
             subject: task.subject,
-            dueDate: task.dueDate,
+            dueDate: moment(task.dueDate).format("YYYY-MM-DD"),
             actions: (
                 <TaskActionsToolBar
                     task={task}

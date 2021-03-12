@@ -54,10 +54,11 @@ export default function TasksTable(props) {
                 mode: "dbclick",
                 blurToSave: true,
                 afterSaveCell: (oldValue, newValue, row, column) => {
-                    const {_id} = row;
-                    const task = {_id: _id, [column.dataField]: newValue};
-                    handleUpdateTask(task, _id);
-                    console.log(task);
+                    if (oldValue !== newValue) {
+                        const {_id} = row;
+                        const task = {_id: _id, [column.dataField]: newValue};
+                        handleUpdateTask(task, _id);
+                    }
                 }
             })}
         />
