@@ -1,19 +1,16 @@
 import {useEffect} from "react";
 import Card from "react-bootstrap/Card";
-import moment from "moment";
 import {useAuth0} from "@auth0/auth0-react";
 import LogoutButton from "../LogoutButton";
 import Spinner from "../Spinner";
 import TasksTable from "./TasksTable";
-import {isNotBlank} from "../../helpers/string-helpers";
 import ToDoAccordion from "./ToDoAccordion";
 import React from "react"
-import {useTask, useTasks, useLoading, createPendingTasksRows, tasksDataBase} from "./ToDoListLogic"
+import {useTasks, useLoading, createPendingTasksRows, tasksDataBase} from "./ToDoListLogic"
 
 export default function ToDoList() {
     const {getAccessTokenSilently} = useAuth0();
     const {getAllTasksDB, saveTaskDB, removeTaskDB, updateTaskDB} = tasksDataBase();
-    const {task, setTask} = useTask();
     const {tasks, addTask, addTasks, removeTask, updateTask} = useTasks();
     const {loading, startLoading, endLoading} = useLoading();
 
@@ -34,45 +31,24 @@ export default function ToDoList() {
         init();
     }, [getAccessTokenSilently]);
 
-    function handleTaskOnChange(event) {
-        const id = event.target.id;
+    async function onSubmitTask(values, {setSubmitting, resetForm}) {
+        try {
+            setSubmitting(true);
+            startLoading();
 
-        switch (id) {
-            case "form-subject":
-                setTask((previousTask) => {
-                    return {...previousTask, subject: event.target.value};
-                });
-                break;
-            case "form-due-date":
-                setTask((previousTask) => {
-                    return {...previousTask, dueDate: event.target.valueAsDate};
-                });
-                break;
-            default:
-        }
-    }
+            const {subject, dueDate} = values;
+            const task = {subject, dueDate, completed: false};
 
-    async function handleCreateTask() {
-        if (isNotBlank(task.subject)) {
-            try {
-                startLoading();
+            console.log("task: ", task);
+            const createdTask = await saveTaskDB(task, getAccessTokenSilently);
+            addTask(createdTask);
 
-                const createdTask = await saveTaskDB(task, getAccessTokenSilently);
+            resetForm();
 
-                addTask(createdTask);
-
-                setTask((previousTask) => {
-                    return {
-                        ...previousTask,
-                        subject: "",
-                        dueDate: moment()
-                    };
-                });
-
-                endLoading();
-            } catch (error) {
-                console.log("error: ", error);
-            }
+            endLoading();
+            setSubmitting(true);
+        } catch (error) {
+            console.log("error: ", error);
         }
     }
 
@@ -140,10 +116,8 @@ export default function ToDoList() {
                 <Card.Header className="text-center">TO DO LIST</Card.Header>
                 {createPendingTasksTable(tasks)}
                 <ToDoAccordion
-                    task={task}
                     tasks={tasks}
-                    handleTaskOnChange={handleTaskOnChange}
-                    handleCreateTask={handleCreateTask}
+                    onSubmitTask={onSubmitTask}
                 />
                 <Card.Footer className="text-center">
                     <LogoutButton/>

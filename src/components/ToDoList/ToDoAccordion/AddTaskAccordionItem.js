@@ -1,10 +1,11 @@
 import Accordion from "react-bootstrap/Accordion";
-import AddTask from "../AddTask";
+import AddTaskForm from "../AddTaskForm";
 import Card from "react-bootstrap/Card";
 import React from "react"
 
 export default function AddTaskAccordionItem(props) {
-    const {task, handleTaskOnChange, handleCreateTask, eventKey} = props;
+    const {onSubmitTask, eventKey} = props;
+
     return (
         <>
             <Accordion.Toggle
@@ -16,10 +17,8 @@ export default function AddTaskAccordionItem(props) {
             </Accordion.Toggle>
             <Accordion.Collapse eventKey={eventKey}>
                 <Card.Body>
-                    <AddTask
-                        task={task}
-                        handleTaskOnChange={handleTaskOnChange}
-                        handleCreateTask={handleCreateTask}
+                    <AddTaskForm
+                        onSubmitTask={onSubmitTask}
                     />
                 </Card.Body>
             </Accordion.Collapse>

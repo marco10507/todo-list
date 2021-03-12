@@ -3,16 +3,6 @@ import moment from "moment";
 import taskAPI from "../../api/TaskApi";
 import TaskActionsToolBar from "./TaskActionsToolBar";
 
-export const useTask = () => {
-    const [task, setTask] = useState({
-        subject: "",
-        completed: false,
-        dueDate: moment()
-    });
-
-    return {task, setTask};
-};
-
 export const useTasks = () => {
     const [tasks, setTasks] = useState([]);
 
