@@ -2,6 +2,7 @@ import BootstrapTable from "react-bootstrap-table-next";
 import cellEditFactory, {Type} from "react-bootstrap-table2-editor";
 import moment from "moment";
 import React from "react"
+import {isBlank} from "../../helpers/string-helpers"
 
 export default function TasksTable(props) {
     const {data, handleUpdateTask} = props;
@@ -15,7 +16,16 @@ export default function TasksTable(props) {
         },
         {
             dataField: "subject",
-            text: "Subject"
+            text: "Subject",
+            validator: (newValue, row, column) => {
+                if (isBlank(newValue)) {
+                    return {
+                        valid: false,
+                        message: 'Subject cannot be blank'
+                    };
+                }
+                return true;
+            }
         },
         {
             dataField: "dueDate",
@@ -25,6 +35,16 @@ export default function TasksTable(props) {
             },
             formatter: (cell) => {
                 return createDate(cell);
+            },
+            validator: (newValue, row, column) => {
+                if (isBlank(newValue)) {
+                    return {
+                        valid: false,
+                        message: 'Due date cannot be blank'
+                    };
+                }
+
+                return true;
             }
         },
         {
