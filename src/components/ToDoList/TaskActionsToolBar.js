@@ -12,10 +12,7 @@ export default function TaskActionsToolBar(props) {
     } = props;
 
     return (
-        <ButtonToolbar
-            className="justify-content-center"
-            aria-label="Toolbar with button groups"
-        >
+        <ButtonToolbar aria-label="Toolbar with button groups">
             <ButtonGroup size="sm" aria-label="First group">
                 <Button className="mr-1" onClick={() => handleCompleteTask(task)}>
                     <BsCheck/>

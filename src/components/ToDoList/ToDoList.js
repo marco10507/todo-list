@@ -38,8 +38,6 @@ export default function ToDoList() {
 
             const {subject, dueDate} = values;
             const task = {subject, dueDate, completed: false};
-
-            console.log("task: ", task);
             const createdTask = await saveTaskDB(task, getAccessTokenSilently);
             addTask(createdTask);
 
